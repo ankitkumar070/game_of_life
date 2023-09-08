@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway's Game of Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Add your CSS styles here */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+        }
+        #element{
+            font-family: 'Press Start 2P', cursive;
+            color:#08f633;
+            font-size: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(20, 20px);
+            border:3px solid #27064f
+        }
+        .cell {
+            width: 20px;
+            height: 20px;
+            border: none;
+        }
+        .alive {
+            background-color: #08f633;
+        }
+        .buttons{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin:10px;
+
+        }
+        .buttons > div{
+            /* margin:3px;
+            width:5rem;
+            height: 1.5rem;
+            background-color: aqua; */
+            margin: 10px;
+            padding: 10px;
+            background-color: aqua;
+            border: 1px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            width:5rem;
+            height: 1.5rem;
+            text-align:center;
+            font-family: 'Press Start 2P', cursive;
+
+        }
+        .buttons > div:hover{
+             width:5.03 rem;
+            height: 1.57 rem;
+            background-color: rgb(14, 94, 94);
+        }
+    </style>
+
+</head>
+<body>
+    <!-- <h1>GAME OF LIFE</h1> -->
+     <span id="element"></span>
+    <div class= "grid" id="grid"></div>
+    <div class="buttons">
+        <div id="startButton">START</div>
+        <div id="stopButton">STOP</div>
+        <div id="clearButton">CLEAR</div>
+    </div>
+   
+    <script>
+        const gridSize = 20;
+        const grid = document.getElementById('grid');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const clearButton = document.getElementById('clearButton');
+        let gridArray = createEmptyGrid();
+        let interval;
+
+        function createEmptyGrid() {
+            const gridArray = new Array(gridSize);
+            for (let i = 0; i < gridSize; i++) {
+                gridArray[i] = new Array(gridSize).fill(false);
+            }
+            return gridArray;
+        }
+
+        function createCell(x, y) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.addEventListener('click', () => toggleCell(x, y));
+            return cell;
+        }
+
+        function toggleCell(x, y) {
+            gridArray[x][y] = !gridArray[x][y];
+            updateCellView(x, y);
+        }
+
+        function updateCellView(x, y) {
+            const cell = document.querySelector(`.grid .cell:nth-child(${y + 1 + x * gridSize})`);
+            if (gridArray[x][y]) {
+                cell.classList.add('alive');
+            } else {
+                cell.classList.remove('alive');
+            }
+        }
+
+        function updateGrid() {
+            const newGridArray = createEmptyGrid();
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    const neighbors = countNeighbors(x, y);
+                    if (gridArray[x][y]) {
+                        newGridArray[x][y] = neighbors === 2 || neighbors === 3;
+                    } else {
+                        newGridArray[x][y] = neighbors === 3;
+                    }
+                    updateCellView(x, y);
+                }
+            }
+            gridArray = newGridArray;
+        }
+
+        function countNeighbors(x, y) {
+            let count = 0;
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    if (i === 0 && j === 0) continue;
+                    const newX = x + i;
+                    const newY = y + j;
+                    if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize && gridArray[newX][newY]) {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        function startGame() {
+            // Randomly initialize some live cells
+            // for (let i = 0; i < gridSize; i++) {
+            //     for (let j = 0; j < gridSize; j++) {
+            //         gridArray[i][j] = Math.random() < 0.2; 
+            //     }
+            // }
+            interval = setInterval(updateGrid, 500); 
+        }
+
+        function stopGame() {
+            clearInterval(interval);
+        }
+
+        function clearGrid() {
+            gridArray = createEmptyGrid();
+            const cells = document.querySelectorAll('.grid .cell');
+            cells.forEach(cell => cell.classList.remove('alive'));
+            clearInterval(interval);
+
+        }
+
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                grid.appendChild(createCell(x, y));
+            }
+        }
+
+        startButton.addEventListener('click', startGame);
+        stopButton.addEventListener('click', stopGame);
+        clearButton.addEventListener('click', clearGrid);
+    </script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <script>
+    var typed = new Typed('#element', {
+      strings: ['GAME OF LIFE'],
+      typeSpeed: 60,
+    });
+  </script>
+</body>
+</html>
+
+
+       
